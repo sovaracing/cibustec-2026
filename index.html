@@ -1,0 +1,188 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Giro Cibus Tec Omet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: strumento da tasca — testata, scelta giro, mappa che si adatta al percorso, elenco tappe con orari */
+:root{
+  --bg:#f3f5f8; --panel:#ffffff; --fg:#14213a; --muted:#5c6a82; --line:#d5dbe5;
+  --omet:#093e83; --am:#0b6bcb; --pm:#d9601a; --hall:#e6eaf1; --hall-on:#dfe8f7; --chip:#eef2f8;
+  --pA:#b42318; --pB:#7a4cc2; --pC:#2f7d4f;
+  --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1520; --panel:#172131; --fg:#e7edf7; --muted:#9aa8bf; --line:#2a3850;
+  --omet:#7fb0ff; --am:#5aa8ff; --pm:#ff9a57; --hall:#1d2a3e; --hall-on:#22365a; --chip:#1f2c42;
+  --pA:#ff7a6e; --pB:#b796ff; --pC:#6fd39a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1520; --panel:#172131; --fg:#e7edf7; --muted:#9aa8bf; --line:#2a3850;
+  --omet:#7fb0ff; --am:#5aa8ff; --pm:#ff9a57; --hall:#1d2a3e; --hall-on:#22365a; --chip:#1f2c42;
+  --pA:#ff7a6e; --pB:#b796ff; --pC:#6fd39a; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:980px;margin:0 auto;padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+header h1{font-family:var(--f-disp);font-weight:700;font-size:30px;line-height:1.05;margin:0;letter-spacing:.2px;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.opt{all:unset;cursor:pointer;background:var(--panel);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
+.opt:focus-visible,.seg button:focus-visible{outline:2px solid var(--omet);outline-offset:2px}
+.opt[aria-pressed="true"]{border-color:var(--omet);box-shadow:inset 0 0 0 1px var(--omet)}
+.opt b{font-family:var(--f-disp);font-size:20px;font-weight:600}
+.opt small{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+.opt span{font-variant-numeric:tabular-nums;font-size:14px}
+.seg{display:inline-flex;background:var(--chip);border-radius:8px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;border-radius:6px;font-weight:500;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.times{display:flex;gap:12px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.times label{display:flex;gap:6px;align-items:center}
+.times input{font:inherit;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 6px}
+.map{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px;overflow-x:auto}
+svg{display:block;width:100%;height:auto;min-width:320px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);padding:6px 4px 0}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px;border-radius:2px}
+.legend .dot{width:10px;height:10px;border-radius:50%}
+.kpi{display:flex;flex-wrap:wrap;gap:8px}
+.kpi div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:0}
+.kpi b{font-family:var(--f-disp);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;display:block;line-height:1.1}
+.kpi small{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+.leg{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;min-width:0}
+.leg h2{font-family:var(--f-disp);font-weight:600;font-size:20px;margin:0;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.leg h2 small{font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+ol{list-style:none;margin:0;padding:0}
+li{display:grid;grid-template-columns:30px 48px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:7px 14px;border-bottom:1px solid var(--line)}
+li:last-child{border-bottom:0}
+li .n{font-family:var(--f-disp);font-weight:700;font-size:18px;text-align:center;color:#fff;border-radius:50%;width:26px;height:26px;line-height:26px}
+li .t{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13.5px}
+li .nm{min-width:0}
+li .nm small{display:block;color:var(--muted);font-size:12.5px}
+li .st{font-variant-numeric:tabular-nums;font-weight:600;font-size:13.5px;white-space:nowrap}
+li.base{background:var(--chip)}
+.pill{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;padding:0 6px;border-radius:4px;margin-left:6px;vertical-align:1px;color:var(--panel)}
+.note{color:var(--muted);font-size:13px;margin:0}
+@media (max-width:520px){.opt b{font-size:18px}.opt span{font-size:13px}header h1{font-size:26px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Giro Cibus Tec · giovedì 29 ottobre</h1>
+    <p>Partenza e rientro allo stand Omet (Pad. 6 – A 052), pranzo allo stand. Scegli il giro.</p>
+  </header>
+
+  <div class="opts" id="opts"></div>
+
+  <div class="bar">
+    <div class="seg" id="seg">
+      <button data-p="mattina" type="button">Mattina</button>
+      <button data-p="pomeriggio" type="button">Pomeriggio</button>
+      <button data-p="tutto" type="button">Tutto il giorno</button>
+    </div>
+    <div class="times">
+      <label for="t1">Partenza mattina <input id="t1" type="time" value="09:30"></label>
+      <label for="t2">Partenza pomeriggio <input id="t2" type="time" value="13:45"></label>
+    </div>
+  </div>
+
+  <div class="kpi" id="kpi"></div>
+
+  <div class="map">
+    <svg id="svg" role="img" aria-label="Mappa schematica dei padiglioni con il percorso"></svg>
+    <div class="legend">
+      <span><i style="background:var(--am)"></i>Mattina</span>
+      <span><i style="background:var(--pm)"></i>Pomeriggio</span>
+      <span><i class="dot" style="background:var(--pA)"></i>Concorrenti</span>
+      <span><i class="dot" style="background:var(--pB)"></i>Legatura, clip, porzionatura</span>
+      <span><i class="dot" style="background:var(--pC)"></i>Fornitori</span>
+    </div>
+  </div>
+
+  <div class="cols" id="legs"></div>
+
+  <p class="note">Posizioni degli stand prese dalle piantine del catalogo ufficiale. Le distanze sono il percorso minimo lungo i corridoi tra uno stand e l'altro, +15% per deviazioni: girando tra gli stand i km reali saranno di più. I passaggi tra i padiglioni 5, 3 e 2 sono stimati dalla planimetria generale (±20%). Velocità di fiera 3 km/h.</p>
+</div>
+
+<script>
+const D={"halls": {"6": {"x0": 0, "y0": 0, "w": 146, "h": 145.2}, "5": {"x0": 146, "y0": 0, "w": 146, "h": 142.8}, "3": {"x0": 340, "y0": 0, "w": 99, "h": 170.3}, "2": {"x0": 465, "y0": 0, "w": 167, "h": 174.6}}, "stands": {"OMET": {"n": "Omet Foodtech (base)", "h": "6", "c": "A 052", "pr": "base", "x": 132.9, "y": 36.1}, "GHE": {"n": "Gherri Meat Technology (Seydelmann, Frey, Supervac…)", "h": "6", "c": "C 028", "pr": "A", "x": 110.7, "y": 80.2}, "HAN": {"n": "Handtmann Italia", "h": "6", "c": "F 022", "pr": "A", "x": 73.0, "y": 98.7}, "VEM": {"n": "Inova Food + Vemag", "h": "6", "c": "B 040", "pr": "A", "x": 120.9, "y": 54.6}, "RIS": {"n": "Risco", "h": "6", "c": "D 040", "pr": "A", "x": 96.9, "y": 56.5}, "INX": {"n": "Inox Meccanica", "h": "6", "c": "E 016", "pr": "A", "x": 84.9, "y": 108.4}, "NOW": {"n": "Nowicki", "h": "6", "c": "D 048", "pr": "A", "x": 96.9, "y": 46.6}, "VEL": {"n": "Velati", "h": "6", "c": "F 016", "pr": "A", "x": 73.0, "y": 109.5}, "TEC": {"n": "Techpartner (Poly-clip, Günther, Viskoteepak)", "h": "6", "c": "C 004", "pr": "B", "x": 105.2, "y": 128.6}, "LAZ": {"n": "Lazzari Equipment (Tipper Tie, Holac)", "h": "6", "c": "C 016", "pr": "B", "x": 108.8, "y": 102.5}, "ICL": {"n": "International Clip", "h": "6", "c": "E 052", "pr": "B", "x": 84.9, "y": 36.5}, "TRE": {"n": "VG Service / Marel Treif", "h": "6", "c": "E 022", "pr": "B", "x": 84.9, "y": 98.5}, "GRA": {"n": "Grasselli", "h": "6", "c": "C 040", "pr": "B", "x": 108.8, "y": 54.6}, "SON": {"n": "Macchine Soncini Alberto", "h": "6", "c": "A 028", "pr": "B", "x": 132.9, "y": 78.6}, "ROL": {"n": "Rollon + Timken", "h": "6", "c": "G 049", "pr": "C", "x": 70.4, "y": 46.6}, "NGI": {"n": "NGI", "h": "5", "c": "I 052", "pr": "C", "x": 187.2, "y": 35.9}, "GHI": {"n": "Ghirri Motoriduttori", "h": "5", "c": "D 058", "pr": "C", "x": 246.7, "y": 24.0}, "ROB": {"n": "Robuschi", "h": "5", "c": "H 021", "pr": "C", "x": 207.7, "y": 94.4}, "GAM": {"n": "Gamavuoto", "h": "3", "c": "B 061", "pr": "C", "x": 424.5, "y": 44.5}, "SKF": {"n": "SKF", "h": "3", "c": "B 010", "pr": "C", "x": 415.2, "y": 143.5}, "AAL": {"n": "Aalberts Surface Technologies", "h": "3", "c": "A 034", "pr": "C", "x": 428.6, "y": 99.2}, "CAV": {"n": "Cavalli Meat Processing", "h": "2", "c": "E 002", "pr": "A", "x": 566.9, "y": 156.9}, "BUS": {"n": "Busch (+ Pfeiffer)", "h": "2", "c": "M 045", "pr": "C", "x": 486.5, "y": 76.7}, "BEC": {"n": "Becker", "h": "2", "c": "L 025", "pr": "C", "x": 497.0, "y": 112.1}, "VAR": {"n": "Varvel", "h": "2", "c": "I 061", "pr": "C", "x": 531.9, "y": 45.5}, "WEG": {"n": "WEG", "h": "2", "c": "F 002", "pr": "C", "x": 555.8, "y": 156.9}, "ELE": {"n": "Elesa", "h": "2", "c": "L 019", "pr": "C", "x": 498.3, "y": 122.8}, "KIP": {"n": "Kipp", "h": "2", "c": "M 057", "pr": "C", "x": 486.6, "y": 54.3}, "IGU": {"n": "Igus", "h": "2", "c": "N 037", "pr": "C", "x": 475.5, "y": 89.7}, "PLA": {"n": "Parmalapping", "h": "2", "c": "I 045", "pr": "C", "x": 531.1, "y": 76.5}}, "res": {"passeggiata": {"mattina": {"order": ["NOW", "RIS", "INX", "VEL", "HAN", "GHE", "VEM"], "km": 0.31, "walk_min": 6, "dwell_min": 130, "tot_min": 136, "path": [[132.9, 36.1], [96.9, 36.1], [96.9, 46.6], [96.9, 46.6], [96.9, 56.5], [84.9, 56.5], [84.9, 108.4], [73.0, 108.4], [73.0, 109.5], [73.0, 109.5], [73.0, 98.7], [110.7, 98.7], [110.7, 80.2], [120.9, 80.2], [120.9, 54.6], [132.9, 54.6], [132.9, 36.1]]}, "pomeriggio": {"order": ["NGI", "SON", "LAZ", "TEC", "TRE", "ICL", "GRA"], "km": 0.49, "walk_min": 10, "dwell_min": 70, "tot_min": 80, "path": [[132.9, 36.1], [132.9, 36], [146, 36], [146, 36], [187.2, 36], [187.2, 35.9], [187.2, 36], [146, 36], [146, 36], [132.9, 36], [132.9, 78.6], [108.8, 78.6], [108.8, 102.5], [105.2, 102.5], [105.2, 128.6], [84.9, 128.6], [84.9, 98.5], [84.9, 98.5], [84.9, 36.5], [108.8, 36.5], [108.8, 54.6], [132.9, 54.6], [132.9, 36.1]]}}, "escursione": {"mattina": {"order": ["NGI", "GHI", "IGU", "BEC", "ELE", "CAV", "PLA", "KIP", "BUS"], "km": 1.38, "walk_min": 28, "dwell_min": 105, "tot_min": 133, "path": [[132.9, 36.1], [132.9, 36], [146, 36], [146, 36], [187.2, 36], [187.2, 35.9], [246.7, 35.9], [246.7, 24.0], [246.7, 72], [292, 72], [340, 85], [340, 85], [439, 85], [465, 87], [475.5, 87], [475.5, 89.7], [497.0, 89.7], [497.0, 112.1], [498.3, 112.1], [498.3, 122.8], [566.9, 122.8], [566.9, 156.9], [531.1, 156.9], [531.1, 76.5], [486.6, 76.5], [486.6, 54.3], [486.5, 54.3], [486.5, 76.7], [486.5, 87], [465, 87], [439, 85], [439, 85], [340, 85], [292, 72], [292, 72], [146, 72], [146, 72], [132.9, 72], [132.9, 36.1]]}, "pomeriggio": {"order": ["SON", "GHE", "LAZ", "TEC", "INX", "VEL", "HAN", "TRE", "ICL", "NOW", "RIS", "GRA", "VEM"], "km": 0.4, "walk_min": 8, "dwell_min": 190, "tot_min": 198, "path": [[132.9, 36.1], [132.9, 36.1], [132.9, 78.6], [110.7, 78.6], [110.7, 80.2], [108.8, 80.2], [108.8, 102.5], [105.2, 102.5], [105.2, 128.6], [84.9, 128.6], [84.9, 108.4], [73.0, 108.4], [73.0, 109.5], [73.0, 109.5], [73.0, 98.7], [84.9, 98.7], [84.9, 98.5], [84.9, 98.5], [84.9, 36.5], [96.9, 36.5], [96.9, 46.6], [96.9, 46.6], [96.9, 56.5], [108.8, 56.5], [108.8, 54.6], [120.9, 54.6], [120.9, 54.6], [132.9, 54.6], [132.9, 36.1]]}}, "maratona": {"mattina": {"order": ["ROB", "SKF", "AAL", "IGU", "BEC", "ELE", "WEG", "CAV", "PLA", "VAR", "KIP", "BUS", "GAM", "GHI", "NGI"], "km": 1.68, "walk_min": 34, "dwell_min": 165, "tot_min": 199, "path": [[132.9, 36.1], [132.9, 72], [146, 72], [146, 72], [207.7, 72], [207.7, 94.4], [207.7, 72], [292, 72], [340, 85], [415.2, 85], [415.2, 143.5], [428.6, 143.5], [428.6, 99.2], [428.6, 85], [439, 85], [465, 87], [475.5, 87], [475.5, 89.7], [497.0, 89.7], [497.0, 112.1], [498.3, 112.1], [498.3, 122.8], [555.8, 122.8], [555.8, 156.9], [566.9, 156.9], [566.9, 156.9], [531.1, 156.9], [531.1, 76.5], [531.9, 76.5], [531.9, 45.5], [486.6, 45.5], [486.6, 54.3], [486.5, 54.3], [486.5, 76.7], [486.5, 87], [465, 87], [439, 85], [424.5, 85], [424.5, 44.5], [424.5, 85], [340, 85], [292, 72], [246.7, 72], [246.7, 24.0], [187.2, 24.0], [187.2, 35.9], [187.2, 36], [146, 36], [146, 36], [132.9, 36], [132.9, 36.1]]}, "pomeriggio": {"order": ["SON", "GHE", "LAZ", "TEC", "INX", "TRE", "VEL", "HAN", "ROL", "ICL", "NOW", "RIS", "GRA", "VEM"], "km": 0.43, "walk_min": 9, "dwell_min": 200, "tot_min": 209, "path": [[132.9, 36.1], [132.9, 36.1], [132.9, 78.6], [110.7, 78.6], [110.7, 80.2], [108.8, 80.2], [108.8, 102.5], [105.2, 102.5], [105.2, 128.6], [84.9, 128.6], [84.9, 108.4], [84.9, 108.4], [84.9, 98.5], [73.0, 98.5], [73.0, 109.5], [73.0, 109.5], [73.0, 98.7], [70.4, 98.7], [70.4, 46.6], [84.9, 46.6], [84.9, 36.5], [96.9, 36.5], [96.9, 46.6], [96.9, 46.6], [96.9, 56.5], [108.8, 56.5], [108.8, 54.6], [120.9, 54.6], [120.9, 54.6], [132.9, 54.6], [132.9, 36.1]]}}}};
+const OPTS=[
+  {k:'passeggiata',nome:'Passeggiata',sub:'Meno fatica'},
+  {k:'escursione',nome:'Escursione',sub:'Tanta fatica'},
+  {k:'maratona',nome:'Maratona',sub:'Troppa fatica'}];
+const COL={A:'var(--pA)',B:'var(--pB)',C:'var(--pC)'};
+const LAB={A:'concorrente',B:'legatura/porz.',C:'fornitore'};
+let st={o:'escursione',p:'tutto'};
+try{const s=JSON.parse(localStorage.getItem('giro')||'{}'); if(s.o)st.o=s.o; if(s.p)st.p=s.p;}catch(e){}
+const $=id=>document.getElementById(id);
+const hm=m=>{m=Math.round(m);return Math.floor(m/60)+' h '+String(m%60).padStart(2,'0')};
+const clock=(t,add)=>{const [h,m]=t.split(':').map(Number);let x=h*60+m+add;return String(Math.floor(x/60)%24).padStart(2,'0')+':'+String(Math.round(x%60)).padStart(2,'0')};
+function tot(o){const r=D.res[o];return {km:r.mattina.km+r.pomeriggio.km,min:r.mattina.tot_min+r.pomeriggio.tot_min,n:r.mattina.order.length+r.pomeriggio.order.length}}
+
+function renderOpts(){
+  $('opts').innerHTML=OPTS.map(o=>{const t=tot(o.k);return `<button class="opt" type="button" data-o="${o.k}" aria-pressed="${st.o===o.k}"><small>${o.sub}</small><b>${o.nome}</b><span>${t.n} stand · ${t.km.toFixed(1).replace('.',',')} km · ${hm(t.min)}</span></button>`}).join('');
+  $('opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{st.o=b.dataset.o;save();render()});
+  $('seg').querySelectorAll('button').forEach(b=>{b.setAttribute('aria-pressed',st.p===b.dataset.p);b.onclick=()=>{st.p=b.dataset.p;save();render()}});
+}
+function save(){try{localStorage.setItem('giro',JSON.stringify(st))}catch(e){}}
+
+function legsShown(){return st.p==='tutto'?['mattina','pomeriggio']:[st.p]}
+
+function renderKpi(){
+  const r=D.res[st.o];let km=0,w=0,s=0,n=0;
+  legsShown().forEach(p=>{km+=r[p].km;w+=r[p].walk_min;s+=r[p].dwell_min;n+=r[p].order.length});
+  $('kpi').innerHTML=`<div><b>${n}</b><small>stand</small></div><div><b>${km.toFixed(2).replace('.',',')} km</b><small>percorso</small></div><div><b>${hm(w)}</b><small>a piedi</small></div><div><b>${hm(s)}</b><small>soste</small></div><div><b>${hm(w+s)}</b><small>totale</small></div>`;
+}
+
+function renderMap(){
+  const r=D.res[st.o];const svg=$('svg');const legs=legsShown();
+  let xs=[],ys=[];
+  legs.forEach(p=>r[p].path.forEach(([x,y])=>{xs.push(x);ys.push(y)}));
+  const used=new Set();legs.forEach(p=>r[p].order.forEach(k=>used.add(D.stands[k].h)));used.add('6');
+  Object.entries(D.halls).forEach(([k,h])=>{if(used.has(k)){xs.push(h.x0,h.x0+h.w);ys.push(h.y0,h.y0+h.h)}});
+  const pad=10;let x0=Math.min(...xs)-pad,x1=Math.max(...xs)+pad,y0=Math.min(...ys)-pad-8,y1=Math.max(...ys)+pad;
+  const W=x1-x0,H=y1-y0,sc=Math.max(W,H*1.6)/640;
+  svg.setAttribute('viewBox',`${x0} ${y0} ${W} ${H}`);
+  const fs=11*sc;let g='';
+  Object.entries(D.halls).forEach(([k,h])=>{
+    g+=`<rect x="${h.x0}" y="${h.y0}" width="${h.w}" height="${h.h}" rx="${2*sc}" fill="${used.has(k)?'var(--hall-on)':'var(--hall)'}" stroke="var(--line)" stroke-width="${1*sc}"/>`;
+    g+=`<text x="${h.x0+h.w/2}" y="${h.y0+h.h/2}" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-size="${46*sc}" font-weight="700" fill="var(--line)" text-anchor="middle" dominant-baseline="middle">${k}</text>`;
+    g+=`<text x="${h.x0+4*sc}" y="${h.y0-3*sc}" font-size="${fs}" fill="var(--muted)">Pad. ${k}</text>`;
+  });
+  const colP={mattina:'var(--am)',pomeriggio:'var(--pm)'};
+  legs.forEach(p=>{
+    const pts=r[p].path.map(([x,y])=>`${x},${y}`).join(' ');
+    g+=`<polyline points="${pts}" fill="none" stroke="${colP[p]}" stroke-width="${2.6*sc}" stroke-linejoin="round" stroke-linecap="round" opacity=".9" ${p==='pomeriggio'&&legs.length>1?`stroke-dasharray="${5*sc} ${3*sc}"`:''}/>`;
+  });
+  legs.forEach(p=>r[p].order.forEach((k,i)=>{
+    const s=D.stands[k];
+    g+=`<circle cx="${s.x}" cy="${s.y}" r="${7*sc}" fill="${COL[s.pr]}" stroke="${colP[p]}" stroke-width="${1.6*sc}"/>`;
+    g+=`<text x="${s.x}" y="${s.y+0.5*sc}" font-size="${9*sc}" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="middle">${legs.length>1?(p==='mattina'?'M':'P'):''}${i+1}</text>`;
+  }));
+  const o=D.stands.OMET;
+  g+=`<rect x="${o.x-8*sc}" y="${o.y-8*sc}" width="${16*sc}" height="${16*sc}" rx="${2*sc}" fill="var(--omet)"/>`;
+  g+=`<text x="${o.x}" y="${o.y+0.5*sc}" font-size="${8.5*sc}" font-weight="700" fill="var(--panel)" text-anchor="middle" dominant-baseline="middle">OM</text>`;
+  svg.innerHTML=g;
+}
+
+function renderLegs(){
+  const r=D.res[st.o];
+  $('legs').innerHTML=legsShown().map(p=>{
+    const L=r[p];const start=p==='mattina'?$('t1').value:$('t2').value;
+    let t=0;const om=D.stands.OMET;let prev='OMET';
+    const rows=[`<li class="base"><span class="n" style="background:var(--omet)">⌂</span><span class="t">${start}</span><span class="nm">Partenza: stand Omet<small>Pad. 6 – A 052</small></span><span class="st"></span></li>`];
+    const walkPer=L.walk_min/(L.order.length+1);
+    L.order.forEach((k,i)=>{
+      const s=D.stands[k];t+=walkPer;const dw=({GHE:30,VEM:20,HAN:20,BUS:20,CAV:15})[k]||({A:15,B:10,C:10})[s.pr];
+      rows.push(`<li><span class="n" style="background:${COL[s.pr]}">${i+1}</span><span class="t">${clock(start,t)}</span><span class="nm">${s.n}<small>Pad. ${s.h} – ${s.c} · ${LAB[s.pr]}</small></span><span class="st">${dw}′</span></li>`);
+      t+=dw;
+    });
+    t+=walkPer;
+    rows.push(`<li class="base"><span class="n" style="background:var(--omet)">⌂</span><span class="t">${clock(start,t)}</span><span class="nm">Rientro allo stand Omet<small>${p==='mattina'?'pranzo':'fine giro'}</small></span><span class="st"></span></li>`);
+    return `<section class="leg"><h2>${p==='mattina'?'Mattina':'Pomeriggio'}<small>${L.km.toFixed(2).replace('.',',')} km · ${hm(L.tot_min)}</small></h2><ol>${rows.join('')}</ol></section>`;
+  }).join('');
+}
+function render(){renderOpts();renderKpi();renderMap();renderLegs()}
+['t1','t2'].forEach(id=>$(id).addEventListener('input',renderLegs));
+render();
+</script>
+
+</body></html>
